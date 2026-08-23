@@ -725,11 +725,6 @@
               <FilePath>..\User\IO_Agreement.h</FilePath>
             </File>
             <File>
-              <FileName>IO_Agreement.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\IO_Agreement.c</FilePath>
-            </File>
-            <File>
               <FileName>soft_protect.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\soft_protect.c</FilePath>
@@ -773,6 +768,11 @@
               <FileName>filament.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\filament.c</FilePath>
+            </File>
+            <File>
+              <FileName>IO_Agreement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\IO_Agreement.c</FilePath>
             </File>
           </Files>
         </Group>
