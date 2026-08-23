@@ -22,8 +22,8 @@ void TIMER14_Config(void)
     timer_initpara.counterdirection  = TIMER_COUNTER_UP;
     timer_initpara.period            = 99;
     timer_initpara.clockdivision     = TIMER_CKDIV_DIV1;
-	// TIMER_CREV(TIMER0) = 5000 - 1;
-    // timer_initpara.repetitioncounter = 0;
+
+	
     timer_init(TIMER14, &timer_initpara);
 
 		timer_interrupt_flag_clear(TIMER14, TIMER_INT_FLAG_UP);
