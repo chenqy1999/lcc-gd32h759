@@ -75,7 +75,6 @@ void PWM_GPIO_Config(void)
     gpio_mode_set(MCH1_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, MCH1_PIN);
     gpio_output_options_set(MCH1_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_60MHZ, MCH1_PIN);
     gpio_af_set(MCH1_PORT, MCH1_AF, MCH1_PIN);
-
 }
 
 /**
