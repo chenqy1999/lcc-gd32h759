@@ -9,6 +9,8 @@ float coeff = -1.0f;
 
 uint32_t freq_cnt = 0;
 
+
+
 /*******ÔöÁ¿Ê½ PID**********/
 uint32_t freq_tbl[21000] = {0};
 void PIDIncre_Init(PID_Incre *pid, float kp, float ki, float kd, float target_val, float max, float min) 

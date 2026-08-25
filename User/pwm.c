@@ -335,7 +335,6 @@ void Command_Process(void)
 					-5000.f				//min
 				);
 				pwm_1s_finish = 0;
-				stage = 0;
 							// 将 TIMER15 的计数器值清零
 				timer_counter_value_config(TIMER15, 0);
 				timer_enable(TIMER15);

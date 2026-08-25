@@ -13,6 +13,7 @@
 #include "gd32h7xx_ospi.h"
 #include "gd32h7xx_ospim.h"
 #include "pid.h"
+#include <string.h>
 
 
 extern void Soft_Delay(__IO uint32_t nCount);
@@ -20,6 +21,12 @@ extern void Soft_Delay(__IO uint32_t nCount);
 volatile int16_t adc_data[8];
 
 float k[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+
+uint8_t rms_Window_Index;
+float rms_Window[128] = {0};
+float rms_Window_Sum = 0;
+
+
 
 /*-------------------- NVIC ??????,??? --------------------*/
 static void ADC_NVIC_Config(void)
@@ -352,12 +359,15 @@ void AD7606C_ReadChannels(void)
     adc_data[6] = (int16_t)((sdob_data >> 16) & 0xFFFF); // CH7
     adc_data[7] = (int16_t)(sdob_data & 0xFFFF);         // CH8
 		
+		
+		/*
 		if ((adc_cnt++ % 100) == 0) 
 		{
 			adc_cnts[ptr] = adc_cnt - 1;
 			KVs[ptr] = adc_data[3] * ADC_INT2FLOAT_5V;
 			FILs[ptr++] = adc_data[2] * ADC_INT2FLOAT_5V;
 		}
+		*/
 }
 
 #endif
@@ -631,6 +641,21 @@ void ADC_Result(void)
 		printf("End Print\n");
 }
 
+void RMS_Avg(float FilCurrent)
+{
+		float tmp = FilCurrent * FilCurrent * INV_128;
+		rms_Window_Sum = rms_Window_Sum - rms_Window[rms_Window_Index] + tmp;
+		rms_Window[rms_Window_Index] = tmp;
+		rms_Window_Index = (rms_Window_Index + 1) & (RMS_N - 1);
+		// %128 == &128-1
+}
+
+void RMS_Init(void)
+{
+		memset(rms_Window, 0, sizeof(rms_Window));
+		rms_Window_Sum = 0;
+		rms_Window_Index = 0;
+}
 
 
 

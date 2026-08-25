@@ -36,7 +36,7 @@
 #define TIMER_CLK_HZ    (300000000UL)    // APB2定时器时钟 300MHz
 
 // 固定PWM工作频率
-#define PWM_FREQ        220000UL         // 默认200kHz
+#define PWM_FREQ        250000UL         // 默认200kHz
 #define PWM_FREQ2       20000UL         // 默认20kHz
 #define PWM_DUTY        50            // 50% (0~100)
 

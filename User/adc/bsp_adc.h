@@ -25,6 +25,10 @@
 #define 	 ADC_INT2FLOAT_5V								 (1.0899467669e-4f*1.5) // 5 / 2^15-1 / 1.4
 
 
+// 灯丝RMS的ADC周期数
+#define RMS_N 20
+#define INV_128 1 / 128.f
+
 // ADC7606C buffer
 extern volatile int16_t adc_data[8];
 
@@ -35,8 +39,9 @@ extern  uint32_t adc_cnt;
 extern  uint32_t ptr;
 extern float KVs[500];
 extern float FILs[500];
-
-
+extern uint8_t rms_Window_Index;
+extern float rms_Window[128];
+extern float rms_Window_Sum;
 
 /* on chip ADC0 setup */
 void ADCX_Init(void);
@@ -58,6 +63,8 @@ void Start_ADC(void);
 void Stop_ADC(void);
 void ADC_Result(void);
 
+
+void RMS_Avg(float FilCurrent);
 
 
 #endif /* __BSP_ADC_H */
