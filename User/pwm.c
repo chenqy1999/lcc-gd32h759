@@ -186,17 +186,32 @@ float Get_Timer_Freq(void)
     psc = TIMER_PSC(TIMER0);
     arr = TIMER_CAR(TIMER0);
 
-    return (float)TIMER_CLK_HZ / ((float)(psc + 1) * (float)(arr + 1));
+    return (float)TIMER_CLK_HZ / ( (float)(psc + 1) * (float)(arr + 1));
 }
 
 float Get_Timer_Duty(uint32_t timer_periph)
 {
-		return (float) TIMER_CH0CV(timer_periph);
+		return (float) TIMER_CH1CV(timer_periph);
 }
 
 void Set_Timer_Duty(uint32_t timer_periph, uint32_t duty)
 {
-		TIMER_CH0CV(timer_periph) = duty;
+		int cmp = ((duty * 25) >> 1) - 50;
+		if (duty < 20) 	// 20% duty, include 4% dead time
+		{
+			TIMER_CH1CV(timer_periph) = 200;
+			TIMER_CH0CV(timer_periph) = 300;
+		}
+		else if (duty > 80)	//80%duty
+		{
+			TIMER_CH1CV(timer_periph) = 950;
+			TIMER_CH0CV(timer_periph) = 1150;
+		}
+		else
+		{
+			TIMER_CH1CV(timer_periph) = cmp;
+			TIMER_CH0CV(timer_periph) = cmp + 100;
+		}
 }
 
 
@@ -321,9 +336,10 @@ void Command_Process(void)
 					1.f,
 					1.f,
 					0.f,
-					3.f,
+					Set_PID_Fil_Current(2.f),
 					100.f,
-					-100.f
+					-100.f,
+					10.f
 				);
 				PIDIncre_Init(
 					&pwmPID,
@@ -332,8 +348,10 @@ void Command_Process(void)
 					10.0f,			//kd
 					30.0e3, 	//Voref
 					5000.f,				//max
-					-5000.f				//min
+					-5000.f,				//min
+					500.f
 				);
+				RMS_Init();
 				pwm_1s_finish = 0;
 							// 将 TIMER15 的计数器值清零
 				timer_counter_value_config(TIMER15, 0);

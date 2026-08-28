@@ -24,7 +24,7 @@ float k[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
 uint8_t rms_Window_Index;
 float rms_Window[128] = {0};
-float rms_Window_Sum = 0;
+float rms_Window_Avg = 0;
 
 
 
@@ -641,19 +641,27 @@ void ADC_Result(void)
 		printf("End Print\n");
 }
 
-void RMS_Avg(float FilCurrent)
+
+float Set_PID_Fil_Current(float setVal)
 {
-		float tmp = FilCurrent * FilCurrent * INV_128;
-		rms_Window_Sum = rms_Window_Sum - rms_Window[rms_Window_Index] + tmp;
+	return setVal * setVal;
+}
+
+
+float RMS_Avg(float FilCurrent)
+{
+		float tmp = FilCurrent * FilCurrent * INV_RMS_N;
+		rms_Window_Avg = rms_Window_Avg - rms_Window[rms_Window_Index] + tmp;
 		rms_Window[rms_Window_Index] = tmp;
-		rms_Window_Index = (rms_Window_Index + 1) & (RMS_N - 1);
+		rms_Window_Index = (rms_Window_Index + 1) % RMS_N;
 		// %128 == &128-1
+		return rms_Window_Avg;
 }
 
 void RMS_Init(void)
 {
 		memset(rms_Window, 0, sizeof(rms_Window));
-		rms_Window_Sum = 0;
+		rms_Window_Avg = 0;
 		rms_Window_Index = 0;
 }
 

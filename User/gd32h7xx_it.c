@@ -187,8 +187,8 @@ void SysTick_Handler(void)
 
 static uint32_t maxFreq = 400000;
 static uint32_t minFreq = 190000;
-static uint32_t maxDuty = 950;
-static uint32_t minDuty = 50;
+static uint32_t maxDuty = 575;
+static uint32_t minDuty = 5;
 
 void EXTI5_9_IRQHandler(void)
 {
@@ -198,12 +198,17 @@ void EXTI5_9_IRQHandler(void)
 				//ReadData();
 				float err;
 				float freq_now;
+				float fil_duty_now = Get_Timer_Duty(TIMER3);
+				float Fil_Current_Real = adc_data[2] * ADC_INT2FLOAT_5V *10.f;
+				float fil_Current_Rms_Now;
+
 			
 				switch(stage) 
 				{
 					case 2:
 					case 3:
 						// PWM PID
+					
 							err = PID_Update(&pwmPID, adc_data[3] * ADC_INT2FLOAT_5V * 20000.f);
 							
 							if ( (Get_Timer_Freq() + coeff * err) > maxFreq )
@@ -218,27 +223,30 @@ void EXTI5_9_IRQHandler(void)
 							{
 									freq_now = Get_Timer_Freq() + coeff * err;
 							}
+					
 							//Update_PWM_Frequency((uint32_t)freq_now);
 							
 					case 1:
 					case 4:
 						// 灯丝PID
-					#if 0
-							err = PID_Update(&filPID, adc_data[2] * ADC_INT2FLOAT_5V * 0.1f);
-							if ((Get_Timer_Duty(TIMER3) + err) > maxDuty)
+							fil_Current_Rms_Now = RMS_Avg(Fil_Current_Real);
+							if (rms_Window_Index == 0)
 							{
-									freq_now = (float) maxDuty;
-							}		
-							else if ((Get_Timer_Duty(TIMER3) + err) < minDuty)
-							{
-									freq_now = (float) minDuty;
+									err = PID_Update(&filPID, fil_Current_Rms_Now);
+									if (fil_duty_now + err > maxDuty)
+									{
+											fil_duty_now = (float) maxDuty;
+									}		
+									else if (fil_duty_now + err < minDuty)
+									{
+											fil_duty_now = (float) minDuty;
+									}
+									else
+									{
+											fil_duty_now += err;
+									}
+									//Set_Timer_Duty(TIMER3, (uint32_t)fil_duty_now);
 							}
-							else
-							{
-									freq_now = (Get_Timer_Duty(TIMER3)) + err;
-							}
-							Set_Timer_Duty(TIMER3, (uint32_t)freq_now);
-					#endif
 					break;
 					
 					default:
@@ -410,7 +418,7 @@ void TIMER15_IRQHandler(void)
 				// 灯丝开始工作，pwm不工作，由
 				case 0:
 					Start_ADC();
-					//Start_Heat();
+					Start_Heat();
 					PWM_Start();
 					printf("Stage %d， timer count:%d, System Mils:%lld\n", stage, TIMER_CNT(TIMER15), SysTick_GetMs_Now());
 					++stage;
@@ -420,7 +428,8 @@ void TIMER15_IRQHandler(void)
 				case 1:
 					freq_cnt = 0;
 					PWM_Stop();
-					//Stop_Heat();
+					Stop_Heat();
+					Stop_ADC();
 					// PWM_Start();
 					printf("Stage %d， timer count:%d, System Mils:%lld\n", stage, TIMER_CNT(TIMER15), SysTick_GetMs_Now());
 					++stage;
@@ -444,7 +453,6 @@ void TIMER15_IRQHandler(void)
 				case 4:
 					//Stop_Heat();
 					//PWM_Stop();
-					Stop_ADC();
 					printf("Stage %d， timer count:%d, System Mils:%lld\n", stage, TIMER_CNT(TIMER15), SysTick_GetMs_Now());
 					timer_disable(TIMER15); // 停止定时器
 

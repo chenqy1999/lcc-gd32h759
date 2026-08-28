@@ -13,7 +13,7 @@ uint32_t freq_cnt = 0;
 
 /*******增量式 PID**********/
 uint32_t freq_tbl[21000] = {0};
-void PIDIncre_Init(PID_Incre *pid, float kp, float ki, float kd, float target_val, float max, float min) 
+void PIDIncre_Init(PID_Incre *pid, float kp, float ki, float kd, float target_val, float max, float min, float meth) 
 {
     *pid = (PID_Incre){0};
 		pid->Kp = kp;
@@ -22,6 +22,7 @@ void PIDIncre_Init(PID_Incre *pid, float kp, float ki, float kd, float target_va
 		pid->errk_2 = pid->errk_1 = pid->errk =  pid->target_val = target_val;
 		pid->out_max = max;
 		pid->out_min = min;
+		pid->min_err_th = meth;
 }
 
 
@@ -32,7 +33,7 @@ float PID_Update(PID_Incre *pid, float feedback_val) {
     // 1. 计算当前偏差 e(k)
     // 计算当前误差
     pid->errk = pid->target_val - feedback_val;
-		if (fabs(pid->errk) < 500.f)	return 0.0f;
+		if (fabs(pid->errk) < pid->min_err_th)	return 0.0f;
 
 
     // 增量式PID

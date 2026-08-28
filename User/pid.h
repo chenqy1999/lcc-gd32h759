@@ -48,6 +48,8 @@ volatile typedef struct {
 		
     float out_max;      // 输出上限（对应最大 PWM 占空比，如 10000）
     float out_min;      // 输出下限（通常为 0 或者是负最大值）
+	
+		float min_err_th;
 } PID_Incre ;
 
 extern PID_Incre pwmPID, filPID;
@@ -57,7 +59,7 @@ extern float coeff;
 extern uint32_t freq_cnt;
 extern uint32_t freq_tbl[21000];
 
-void PIDIncre_Init(PID_Incre *pid, float kp, float ki, float kd, float target_val, float min, float max);
+void PIDIncre_Init(PID_Incre *pid, float kp, float ki, float kd, float target_val, float min, float max, float meth);
 
 // 增量式PID
 float PID_Update(PID_Incre *pid, float feedback_val);

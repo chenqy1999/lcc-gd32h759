@@ -11,7 +11,7 @@
 #define FIL_DMA_CH		DMA_CH2
 
 
-uint32_t duty = 0;
+uint32_t duty = 200;
 uint32_t cmd[4] = {PK12RESET, PK1SET, PK12RESET, PK2SET};
 
 uint32_t cmdHigh[2] = {PK1SET, PK12RESET};
@@ -50,7 +50,7 @@ void Fil_Pwn_Timer_Init(void)
     timer_ocinitpara.ocpolarity   = TIMER_OC_POLARITY_HIGH;
     timer_ocinitpara.ocidlestate  = TIMER_OC_IDLE_STATE_LOW;
     timer_channel_output_config(FILAMENT_TIMER, TIMER_CH_0, &timer_ocinitpara);
-    timer_channel_output_pulse_value_config(FILAMENT_TIMER, TIMER_CH_0, 675);
+    timer_channel_output_pulse_value_config(FILAMENT_TIMER, TIMER_CH_0, duty+100);
 		timer_channel_output_mode_config(FILAMENT_TIMER, TIMER_CH_0, TIMER_OC_MODE_TIMING);
 		timer_auto_reload_shadow_enable(FILAMENT_TIMER);
 		/* 使能TIMER3的CMP的DMA请求（更新事件） */
@@ -63,7 +63,7 @@ void Fil_Pwn_Timer_Init(void)
     timer_ocinitpara.ocpolarity   = TIMER_OC_POLARITY_HIGH;
     timer_ocinitpara.ocidlestate  = TIMER_OC_IDLE_STATE_LOW;
     timer_channel_output_config(FILAMENT_TIMER, TIMER_CH_1, &timer_ocinitpara);
-    timer_channel_output_pulse_value_config(FILAMENT_TIMER, TIMER_CH_1, 575);
+    timer_channel_output_pulse_value_config(FILAMENT_TIMER, TIMER_CH_1, duty);
 		timer_channel_output_mode_config(FILAMENT_TIMER, TIMER_CH_1, TIMER_OC_MODE_TIMING);
 		timer_auto_reload_shadow_enable(FILAMENT_TIMER);
 		/* 使能TIMER3的CMP的DMA请求（更新事件） */
@@ -121,9 +121,6 @@ void Fil_Dma_Init1(void)
     dma_initpara.memory0_addr					= (uint32_t)cmdLow;
     dma_multi_data_mode_init(FIL_DMA, DMA_CH3, &dma_initpara);
     dma_channel_enable(FIL_DMA, DMA_CH3);
-		
-		
-
 }
 
 
